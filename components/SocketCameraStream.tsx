@@ -195,10 +195,10 @@ export const SocketCameraStream: React.FC<SocketCameraStreamProps> = ({
               <Text className="text-white font-semibold text-sm ml-2">ESP32-CAM Stream</Text>
             </View>
             
-            {/* Socket.IO Badge */}
+            {/* WebSocket Badge */}
             <View className="flex-row items-center bg-blue-600/30 px-3 py-1.5 rounded-full border border-blue-500/50">
               <MaterialIcons name="flash-on" size={14} color="#60A5FA" />
-              <Text className="text-blue-300 font-semibold text-xs ml-1">Socket.IO</Text>
+              <Text className="text-blue-300 font-semibold text-xs ml-1">WebSocket</Text>
             </View>
           </View>
         </View>
