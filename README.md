@@ -1,51 +1,89 @@
-# Welcome to your Expo app 👋
+# ESP32 Camera IoT Frontend
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+React Native app for ESP32 camera streaming with disease prediction.
 
-## Get started
+## Quick Setup
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### 1. Install Dependencies
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Configure Environment Variables
 
-## Learn more
+Create `.env` file:
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+cp .env.example .env
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Update `.env` with your computer's IP:
 
-## Join the community
+```env
+EXPO_PUBLIC_PRODUCTION_URL=https://iot-backend-uy96.onrender.com
+EXPO_PUBLIC_LOCAL_URL=http://YOUR_IP:3000
+```
 
-Join our community of developers creating universal apps.
+**Find your IP:**
+- Windows: `ipconfig`
+- Mac/Linux: `ifconfig` or `ip addr`
+- Look for `192.168.x.x` or `10.0.x.x`
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-# IOT_Frontend
+### 3. Start Development Server
+
+```bash
+npm start
+```
+
+**Important:** Restart Expo after changing `.env`
+
+### 4. Run on Device
+
+**Development (Expo Go):**
+```bash
+npm start
+# Scan QR code with Expo Go app
+```
+
+**Native Build:**
+```bash
+# Android
+npx expo run:android
+
+# iOS
+npx expo run:ios
+```
+
+## Platform Configuration
+
+- **Android Emulator**: Uses `http://10.0.2.2:3000` (automatic)
+- **iOS Simulator**: Uses `http://localhost:3000` (automatic)
+- **Physical Device**: Uses `EXPO_PUBLIC_LOCAL_URL` from `.env`
+
+## Environment Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `EXPO_PUBLIC_PRODUCTION_URL` | Production backend | `https://iot-backend-uy96.onrender.com` |
+| `EXPO_PUBLIC_LOCAL_URL` | Local backend (physical device) | `http://192.168.0.115:3000` |
+
+## Features
+
+- Real-time camera streaming via WebSocket
+- Disease prediction with AI
+- Production/Development mode toggle
+- Works on emulators and physical devices
+
+## Troubleshooting
+
+**Can't connect from physical device?**
+1. Check phone and computer are on same WiFi
+2. Verify IP in `.env` matches your computer's IP
+3. Restart Expo after changing `.env`
+4. Ensure backend server is running
+
+**Environment variables not working?**
+1. Make sure `.env` file exists in project root
+2. Variables must be prefixed with `EXPO_PUBLIC_`
+3. Restart Expo dev server after changes

@@ -355,7 +355,7 @@ export default function Index() {
               onPress={() => {
                 Alert.alert(
                   'ESP32-CAM Info',
-                  `Mode: Socket.IO + HTTP API\n\nBackend URL: ${backendUrl}\n\nImages saved to:\n• Backend server only\n\nFeatures:\n• Real-time streaming (Socket.IO)\n• AI Disease Prediction\n• Automatic ML analysis\n• Multi-client support\n• ~10 FPS stream\n• VGA resolution\n• Plant disease detection\n• Treatment recommendations`,
+                  `Mode: WebSocket + HTTP API\n\nBackend URL: ${backendUrl}\n\nDevice: Physical Device\n\nImages saved to:\n• Backend server only\n\nFeatures:\n• Real-time streaming (WebSocket)\n• AI Disease Prediction\n• Automatic ML analysis\n• Multi-client support\n• ~10 FPS stream\n• VGA resolution\n• Plant disease detection\n• Treatment recommendations`,
                   [{ text: 'OK' }]
                 );
               }}
@@ -368,8 +368,8 @@ export default function Index() {
           {/* Quick Stats */}
           <View className="flex-row justify-around mt-4 pt-4 border-t border-gray-800">
             <View className="items-center">
-              <Text className="text-gray-500 text-xs uppercase tracking-wider mb-1">Mode</Text>
-              <Text className="text-white font-bold text-sm">Socket.IO</Text>
+              <Text className="text-gray-500 text-xs uppercase tracking-wider mb-1">Device</Text>
+              <Text className="text-white font-bold text-sm">Physical</Text>
             </View>
             <View className="items-center">
               <Text className="text-gray-500 text-xs uppercase tracking-wider mb-1">Resolution</Text>

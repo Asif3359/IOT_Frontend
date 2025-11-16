@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Platform } from 'react-native';
 
 interface CameraContextType {
   backendUrl: string;
@@ -13,22 +12,13 @@ interface CameraContextType {
 
 const CameraContext = createContext<CameraContextType | undefined>(undefined);
 
-// Production backend URL
-const PRODUCTION_URL = 'https://iot-backend-uy96.onrender.com';
+// Environment variables from .env
+const PRODUCTION_URL = process.env.EXPO_PUBLIC_PRODUCTION_URL || 'https://iot-backend-uy96.onrender.com';
+const LOCAL_URL = process.env.EXPO_PUBLIC_LOCAL_URL || 'http://192.168.0.115:3000';
 
-// Auto-detect backend URL based on platform (for emulator support)
+// Default to LOCAL_URL (physical device only)
 const getDefaultBackendUrl = (): string => {
-  if (__DEV__) {
-    if (Platform.OS === 'android') {
-      // Android Emulator uses special alias for host machine
-      return 'http://10.0.2.2:3000';
-    } else if (Platform.OS === 'ios') {
-      // iOS Simulator can use localhost
-      return 'http://localhost:3000';
-    }
-  }
-  // Physical device - use your computer's IP
-  return 'http://192.168.0.115:3000';
+  return LOCAL_URL;
 };
 
 export const CameraProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

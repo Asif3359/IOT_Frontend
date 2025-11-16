@@ -13,6 +13,10 @@ import {
 } from 'react-native';
 import { useCamera } from '../providers/CameraProvider';
 
+// Environment variables from .env
+const PRODUCTION_URL = process.env.EXPO_PUBLIC_PRODUCTION_URL || 'https://iot-backend-uy96.onrender.com';
+const LOCAL_URL = process.env.EXPO_PUBLIC_LOCAL_URL || 'http://192.168.0.115:3000';
+
 interface SettingsModalProps {
   visible: boolean;
   onClose: () => void;
@@ -64,17 +68,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }
   const handleProductionToggle = (value: boolean) => {
     setTempIsProduction(value);
     if (value) {
-      // Switch to production URL
-      setTempBackendUrl('https://iot-backend-uy96.onrender.com');
+      // Switch to production URL from .env
+      setTempBackendUrl(PRODUCTION_URL);
     } else {
-      // Switch to local development URL
-      if (Platform.OS === 'android') {
-        setTempBackendUrl('http://10.0.2.2:3000');
-      } else if (Platform.OS === 'ios') {
-        setTempBackendUrl('http://localhost:3000');
-      } else {
-        setTempBackendUrl('http://192.168.0.115:3000');
-      }
+      // Switch to local development URL (physical device)
+      setTempBackendUrl(LOCAL_URL);
     }
   };
 
@@ -85,12 +83,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View className="flex-1 bg-black/70 items-center justify-center p-6">
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          className="w-full max-w-md"
-        >
-          <View className="bg-gray-900 rounded-3xl p-6 shadow-2xl max-h-[90%]">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      >
+        <View className="flex-1 bg-black/70 items-center justify-center p-6">
+          <View className="bg-gray-900 rounded-3xl p-6 shadow-2xl max-h-[90%] w-full max-w-md">
             {/* Header */}
             <View className="flex-row items-center justify-between mb-6">
               <View className="flex-row items-center">
@@ -164,44 +163,28 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }
                 <TextInput
                   value={tempBackendUrl}
                   onChangeText={setTempBackendUrl}
-                  placeholder="http://10.0.2.2:3000"
+                  placeholder="http://192.168.0.115:3000"
                   placeholderTextColor="#6B7280"
                   className="bg-gray-800 text-white px-4 py-4 rounded-2xl text-lg border-2 border-gray-700 focus:border-blue-500"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  keyboardType="url"
+                  returnKeyType="done"
                 />
                 
                 {/* Quick Select Buttons */}
                 {!tempIsProduction && (
                   <View className="mt-3 bg-gray-800 rounded-xl p-3">
-                    <Text className="text-gray-400 text-xs font-semibold mb-2">Quick Select (Local):</Text>
+                    <Text className="text-gray-400 text-xs font-semibold mb-2">Quick Select (Local Network):</Text>
                     <View className="flex-row flex-wrap gap-2">
-                      {Platform.OS === 'android' && (
-                        <TouchableOpacity
-                          onPress={() => {
-                            setTempBackendUrl('http://10.0.2.2:3000');
-                            setTempIsProduction(false);
-                          }}
-                          className="bg-gray-700 px-3 py-2 rounded-lg active:opacity-70"
-                        >
-                          <Text className="text-blue-400 text-xs font-semibold">Emulator</Text>
-                        </TouchableOpacity>
-                      )}
                       <TouchableOpacity
                         onPress={() => {
-                          setTempBackendUrl('http://localhost:3000');
+                          setTempBackendUrl(LOCAL_URL);
                           setTempIsProduction(false);
                         }}
                         className="bg-gray-700 px-3 py-2 rounded-lg active:opacity-70"
                       >
-                        <Text className="text-blue-400 text-xs font-semibold">Localhost</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => {
-                          setTempBackendUrl('http://192.168.0.115:3000');
-                          setTempIsProduction(false);
-                        }}
-                        className="bg-gray-700 px-3 py-2 rounded-lg active:opacity-70"
-                      >
-                        <Text className="text-blue-400 text-xs font-semibold">LAN</Text>
+                        <Text className="text-blue-400 text-xs font-semibold">Local (.env)</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -224,9 +207,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }
                 {!tempIsProduction && (
                   <View className="mt-3 bg-gray-800 rounded-xl p-3">
                     <Text className="text-gray-400 text-xs leading-relaxed">
-                      <Text className="font-bold">Android Emulator:</Text> use 10.0.2.2{'\n'}
-                      <Text className="font-bold">iOS Simulator:</Text> use localhost{'\n'}
-                      <Text className="font-bold">Physical Device:</Text> use your computer's IP (192.168.x.x)
+                      <Text className="font-bold">Physical Device:</Text> Use your computer's local IP address (e.g., 192.168.0.115:3000){'\n\n'}
+                      <Text className="font-bold">Find your IP:</Text>{'\n'}
+                      • Windows: ipconfig{'\n'}
+                      • Mac/Linux: ifconfig or ip addr
                     </Text>
                   </View>
                 )}
@@ -305,8 +289,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }
               </View>
             </ScrollView>
           </View>
-        </KeyboardAvoidingView>
-      </View>
+        </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
