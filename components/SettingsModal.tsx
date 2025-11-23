@@ -1,15 +1,15 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { useCamera } from '../providers/CameraProvider';
 
@@ -175,16 +175,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }
                 {/* Quick Select Buttons */}
                 {!tempIsProduction && (
                   <View className="mt-3 bg-gray-800 rounded-xl p-3">
-                    <Text className="text-gray-400 text-xs font-semibold mb-2">Quick Select (Local Network):</Text>
+                    <Text className="text-gray-400 text-xs font-semibold mb-2">Quick Select:</Text>
                     <View className="flex-row flex-wrap gap-2">
+                      <TouchableOpacity
+                        onPress={() => {
+                          setTempBackendUrl('http://10.0.2.2:3000');
+                          setTempIsProduction(false);
+                        }}
+                        className="bg-blue-700 px-3 py-2 rounded-lg active:opacity-70"
+                      >
+                        <Text className="text-white text-xs font-semibold">📱 Android Emulator</Text>
+                      </TouchableOpacity>
                       <TouchableOpacity
                         onPress={() => {
                           setTempBackendUrl(LOCAL_URL);
                           setTempIsProduction(false);
                         }}
-                        className="bg-gray-700 px-3 py-2 rounded-lg active:opacity-70"
+                        className="bg-green-700 px-3 py-2 rounded-lg active:opacity-70"
                       >
-                        <Text className="text-blue-400 text-xs font-semibold">Local (.env)</Text>
+                        <Text className="text-white text-xs font-semibold">📲 Physical Device</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -207,10 +216,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }
                 {!tempIsProduction && (
                   <View className="mt-3 bg-gray-800 rounded-xl p-3">
                     <Text className="text-gray-400 text-xs leading-relaxed">
-                      <Text className="font-bold">Physical Device:</Text> Use your computer's local IP address (e.g., 192.168.0.115:3000){'\n\n'}
+                      <Text className="font-bold text-blue-400">For Android Emulator:</Text>{'\n'}
+                      Use: http://10.0.2.2:3000{'\n'}
+                      (Special IP that maps to host's localhost){'\n\n'}
+                      
+                      <Text className="font-bold text-green-400">For Physical Device:</Text>{'\n'}
+                      Use your computer's local IP (e.g., 192.168.0.115:3000){'\n\n'}
+                      
                       <Text className="font-bold">Find your IP:</Text>{'\n'}
                       • Windows: ipconfig{'\n'}
-                      • Mac/Linux: ifconfig or ip addr
+                      • Mac/Linux: ifconfig or ip addr{'\n\n'}
+                      
+                      ⚠️  Both phone and computer must be on the same WiFi network!
                     </Text>
                   </View>
                 )}

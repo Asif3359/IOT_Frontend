@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Alert, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SettingsModal } from '../components/SettingsModal';
@@ -58,6 +58,9 @@ export default function Index() {
   const [lastCarCommand, setLastCarCommand] = useState<string | null>(null);
   const [motorSpeed, setMotorSpeed] = useState(200);
   const [showCarControls, setShowCarControls] = useState(false);
+  
+  // Status polling
+  const statusPollInterval = useRef<number | null>(null);
 
   useEffect(() => {
     // Update API base URLs when backend URL changes
@@ -73,10 +76,16 @@ export default function Index() {
     carSocket.on('connected', (connected: boolean) => {
       setCarConnected(connected);
       setCarConnecting(false);
+      
+      // Start polling car status when connected
+      if (connected) {
+        pollCarStatus();
+      }
     });
 
     // Car status updates
     carSocket.on('status', (status: CarStatus) => {
+      console.log('📊 Received car status:', status);
       setCarStatus(status);
     });
 
@@ -89,6 +98,13 @@ export default function Index() {
     // Device connected/disconnected
     carSocket.on('device_connected', (data: { device: string; status: string }) => {
       console.log('🚗 ESP32 car connected:', data.device);
+      // Update status to show car is connected
+      setCarStatus({
+        connected: true,
+        lastUpdate: new Date().toISOString(),
+        status: data.status || 'ready',
+        deviceInfo: data.device
+      });
     });
 
     carSocket.on('device_disconnected', () => {
@@ -110,6 +126,11 @@ export default function Index() {
       carSocket.off('device_disconnected');
       carSocket.off('error');
       carSocket.disconnect();
+      
+      // Clear status polling
+      if (statusPollInterval.current) {
+        clearInterval(statusPollInterval.current);
+      }
     };
   }, []);
 
@@ -232,6 +253,37 @@ export default function Index() {
     }
   };
 
+  // Poll car status periodically (fallback if WebSocket messages are missed)
+  const pollCarStatus = async () => {
+    // Clear any existing interval
+    if (statusPollInterval.current) {
+      clearInterval(statusPollInterval.current);
+    }
+    
+    // Check status immediately
+    await checkCarStatus();
+    
+    // Then poll every 3 seconds
+    statusPollInterval.current = setInterval(async () => {
+      if (carSocket.isConnected()) {
+        await checkCarStatus();
+      }
+    }, 3000);
+  };
+
+  const checkCarStatus = async () => {
+    try {
+      const status = await carApi.getStatus();
+      if (status && status.car) {
+        console.log('🔄 Polled car status:', status.car.connected ? 'ESP32 Online' : 'ESP32 Offline');
+        setCarStatus(status.car);
+      }
+    } catch (error) {
+      // Silently fail - this is just a fallback mechanism
+      console.log('🔕 Status poll failed (this is normal if backend is not ready)');
+    }
+  };
+
   // Car Control Functions
   const connectCarWebSocket = () => {
     if (carSocket.isConnected()) {
@@ -252,6 +304,12 @@ export default function Index() {
   };
 
   const disconnectCarWebSocket = () => {
+    // Stop status polling
+    if (statusPollInterval.current) {
+      clearInterval(statusPollInterval.current);
+      statusPollInterval.current = null;
+    }
+    
     carSocket.disconnect();
     setCarConnected(false);
     setCarStatus(null);
